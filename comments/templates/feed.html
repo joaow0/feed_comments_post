@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Feed</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f0f2f5;
+        }
+        .post {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .post img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        .date {
+            color: gray;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<h1 style="text-align:center;">Feed</h1>
+
+{% for post in posts %}
+    <div class="post">
+        <p class="date">Posted on {{ post.created_at|date:"d/m/Y H:i" }}</p>
+
+        {% if post.content %}
+            <p>{{ post.content }}</p>
+        {% endif %}
+
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="Post Image">
+        {% endif %}
+
+        <!-- Comments -->
+        <div class="comments">
+            <h4>Comments:</h4>
+            <ul>
+                {% for comment in post.comments.all %}
+                    <li>
+                        <small>{{ comment.created_at|date:"d/m/Y H:i" }}</small><br>
+                        {{ comment.text }}
+                    </li>
+                {% empty %}
+                    <li>Be the first to comment!</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Comment Form -->
+        <form action="{% url 'add_comment' post.id %}" method="POST">
+            {% csrf_token %}
+            <textarea name="text" rows="2" placeholder="Write a comment..."></textarea><br>
+            <button type="submit">Comment</button>
+        </form>
+    </div>
+{% empty %}
+    <p style="text-align:center;">No posts yet.</p>
+{% endfor %}
+
+</body>
+</html>
